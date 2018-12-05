@@ -2,12 +2,13 @@ package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import sun.jvm.hotspot.utilities.Assert;
+
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ public class MainPageObject {
     }
     public WebElement waitForElementPresent(String locator, String error_message)
     {
-        return waitForElementPresent(locator, error_message, 5);
+        return waitForElementPresent(locator, error_message, 10);
     }
 
     public WebElement waitForElementAndClick(String locator, String error_message, long timeOutAndSeconds)
@@ -78,6 +79,25 @@ public class MainPageObject {
         int end_y = (int) (size.height * 0.2);
 
         action.press(x, start_y).waitAction(timeOfSwipe).moveTo(x, end_y).release().perform();
+    }
+
+    public void swipeUpTillElementAppear(String locator, String error_message, int max_swipes)
+    {
+        int already_swiped = 0;
+
+        while(!this.isElementLocatorOnTheScreen(locator))
+            if(already_swiped > max_swipes){
+                Assert.assertTrue(error_message, this.isElementLocatorOnTheScreen(locator));
+            }
+            swipeUpQuick();
+            ++already_swiped;
+    }
+
+    public boolean isElementLocatorOnTheScreen(String locator)
+    {
+        int element_location_by_y = this.waitForElementPresent(locator, "Cannot find element by locator", 1).getLocation().getY();
+        int screen_size_by_y = driver.manage().window().getSize().getHeight();
+        return element_location_by_y < screen_size_by_y;
     }
 
     public void swipeUpQuick()
